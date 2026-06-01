@@ -1,0 +1,4 @@
+interface:
+  display_name: "Init Spec"
+  short_description: "Initialize specs for DDD Java projects."
+  default_prompt: "Use $init-spec to analyze this Java project and initialize its specification files."

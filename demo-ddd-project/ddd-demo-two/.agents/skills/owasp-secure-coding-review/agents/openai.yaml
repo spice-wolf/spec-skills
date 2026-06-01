@@ -1,0 +1,4 @@
+interface:
+  display_name: "OWASP Secure Coding Review"
+  short_description: "Review systems and code against OWASP guidance"
+  default_prompt: "Use $owasp-secure-coding-review to assess this design or code against OWASP secure coding guidance."

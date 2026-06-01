@@ -1,0 +1,4 @@
+interface:
+  display_name: "Retrieval Spec"
+  short_description: "Route and load project specifications."
+  default_prompt: "Use $retrieval-spec to choose and load the minimum specification files for this task."
