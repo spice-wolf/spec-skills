@@ -1,4 +1,4 @@
 interface:
   display_name: "Init Spec"
-  short_description: "Initialize specs for DDD Java projects."
-  default_prompt: "Use $init-spec to analyze this Java project and initialize its specification files."
+  short_description: "为 DDD Java 项目初始化 spec。"
+  default_prompt: "使用 $init-spec 分析这个 Java 项目，并初始化其 specification 文件。"

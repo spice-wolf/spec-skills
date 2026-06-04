@@ -1,4 +1,4 @@
 interface:
   display_name: "Indexing Spec"
-  short_description: "Maintain specification manifest index."
-  default_prompt: "Use $indexing-spec to update the specification manifest index for this project."
+  short_description: "维护 Specification manifest index。"
+  default_prompt: "使用 $indexing-spec 更新此项目的 Specification manifest index。"

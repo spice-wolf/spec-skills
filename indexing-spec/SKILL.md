@@ -1,19 +1,19 @@
 ---
 name: indexing-spec
-description: Maintain the Specification manifest index at `./specification/index.md` for Spec-Driven Development (SDD). Use when Specification markdown files are created, updated, deleted, or when their YAML frontmatter changes, especially to incrementally refresh only the affected manifest entries instead of rebuilding the whole index.
+description: 维护 `./specification/index.md` 中用于 Spec-Driven Development (SDD) 的 Specification manifest index。当 Specification markdown 文件被创建、更新、删除，或其 YAML frontmatter 发生变化时使用，尤其适用于仅 incremental refresh 受影响的 manifest entries，而不是重建整个 index。
 ---
 
 # Indexing Spec
 
-Maintain the project's Specification index only. Do not solve business requirements as part of this skill.
+仅维护项目的 Specification index。不要把解决业务需求作为这个 skill 的一部分。
 
-Use this skill to keep `./specification/index.md` accurate so later retrieval can decide which Specification files to load with minimal context.
+使用这个 skill 保持 `./specification/index.md` 准确，以便后续 retrieval 能够用最小 context 判断需要加载哪些 Specification 文件。
 
-## Goal
+## 目标
 
-Keep one manifest entry per Specification file in `./specification` except `index.md` itself.
+为 `./specification` 中除 `index.md` 自身之外的每个 Specification 文件保留一条 manifest entry。
 
-Each manifest entry must contain:
+每条 manifest entry 必须包含：
 - `path`
 - `name`
 - `description`
@@ -22,102 +22,102 @@ Each manifest entry must contain:
 - `triggers`
 - `priority`
 
-Represent each entry as JSON. Follow the index format in [references/index-format.md](references/index-format.md).
-When `./specification/index.md` does not exist yet, start from [references/index-template.md](references/index-template.md).
+每条 entry 都以 JSON 表示。遵循 [references/index-format.md](references/index-format.md) 中的 index format。
+当 `./specification/index.md` 尚不存在时，从 [references/index-template.md](references/index-template.md) 开始。
 
 ## Workflow
 
-1. Determine the Specification root.
-   If the user did not provide it, ask for it and recommend `./specification`.
+1. 确定 Specification root。
+   如果用户没有提供，询问用户并推荐 `./specification`。
 
-2. Find the changed Specification files.
-   Prefer incremental detection in this order:
-   - files explicitly named by the user
-   - `git diff --name-only` or `git status --short`
-   - a focused filesystem scan inside `./specification`
+2. 找出已变更的 Specification 文件。
+   按以下顺序优先进行 incremental detection：
+   - 用户明确点名的文件
+   - `git diff --name-only` 或 `git status --short`
+   - 在 `./specification` 内进行有针对性的 filesystem scan
 
-3. Exclude `index.md` from indexing.
-   Include other Specification markdown files under the root, including operational files such as `TODO.md` only if they already exist under the Specification root.
+3. 从 indexing 中排除 `index.md`。
+   包含 root 下其他 Specification markdown 文件，包括 `TODO.md` 等 operational files，但前提是它们已经存在于 Specification root 下。
 
-4. Read the affected Specification files and the current `./specification/index.md`.
-   Only inspect unchanged Specification files if the existing index is missing, corrupt, or clearly stale.
+4. 读取受影响的 Specification 文件和当前的 `./specification/index.md`。
+   只有当现有 index 缺失、损坏或明显过期时，才检查未变更的 Specification 文件。
 
-5. For each affected file, build or refresh one manifest entry.
-   Prefer file frontmatter first, then use path, headings, and concise body evidence to fill fields that frontmatter does not provide.
+5. 为每个受影响的文件构建或刷新一条 manifest entry。
+   优先使用文件 frontmatter，然后使用 path、headings 和简洁的 body evidence 填充 frontmatter 未提供的字段。
 
-6. Update only the affected manifest entries when possible.
-   Preserve unchanged entries and keep a stable ordering.
+6. 在可能时仅更新受影响的 manifest entries。
+   保留未变更的 entries，并保持稳定排序。
 
-7. Remove manifest entries for deleted Specification files.
+7. 移除已删除 Specification 文件对应的 manifest entries。
 
-8. Write the updated `./specification/index.md`.
+8. 写入更新后的 `./specification/index.md`。
 
-## Manifest Derivation Rules
+## Manifest Derivation Rules（manifest 推导规则）
 
 ### `path`
 
-- Use the path relative to `./specification`
-- Always use forward slashes
+- 使用相对于 `./specification` 的 path
+- 始终使用 forward slashes
 
 ### `name`
 
-- Prefer the YAML frontmatter `name`
-- If the file has no frontmatter, derive a stable name from its role and filename
+- 优先使用 YAML frontmatter 中的 `name`
+- 如果文件没有 frontmatter，根据其角色和文件名推导一个稳定的 name
 
 ### `description`
 
-- Prefer the YAML frontmatter `description`
-- If missing, derive a short routing-oriented summary that explains:
-  - what the file contains
-  - when it should be loaded during SDD
+- 优先使用 YAML frontmatter 中的 `description`
+- 如果缺失，推导一个简短、面向 routing 的 summary，说明：
+  - 文件包含什么
+  - 在 SDD 期间何时应加载它
 
 ### `always_load`
 
-- `true` only for `constitution/constitution.md`
-- `false` for all other Specification files unless the user explicitly wants another globally loaded file
+- 仅 `constitution/constitution.md` 使用 `true`
+- 所有其他 Specification 文件使用 `false`，除非用户明确希望另一个文件也全局加载
 
 ### `domains`
 
-- Use business domains, not technical layers
-- For `domain/*.md`, include the concrete domain name and obvious aliases when they are present in the file
-- For global files such as `constitution.md`, `architecture.md`, or `tool.md`, use an empty array unless the file is intentionally scoped to specific domains
+- 使用 business domains，而不是 technical layers
+- 对于 `domain/*.md`，当文件中出现具体 domain name 和明显 aliases 时，将它们包含进来
+- 对于 `constitution.md`、`architecture.md` 或 `tool.md` 等 global files，除非文件有意限定到特定 domains，否则使用空数组
 
 ### `triggers`
 
-- Record short phrases that help route future tasks to this file
-- Prefer domain terms, business capabilities, and task categories already visible in the file
-- Avoid generic triggers such as `code`, `bugfix`, or `task`
+- 记录有助于将未来 tasks route 到该文件的短语
+- 优先使用文件中已经可见的 domain terms、business capabilities 和 task categories
+- 避免 `code`、`bugfix` 或 `task` 等泛化 triggers
 
 ### `priority`
 
-Use loading tiers rather than arbitrary numbers:
+使用 loading tiers，而不是任意数字：
 - `L0`: always-load constitutional rules
-- `L1`: task-type files such as architecture, DDD, and tool guidance
-- `L2`: domain files such as `domain/merchant.md` and `domain/terminal.md`
-- `L3`: optional or operational Specification files that are usually not part of the minimum load set
+- `L1`: task-type files，例如 architecture、DDD 和 tool guidance
+- `L2`: domain files，例如 `domain/merchant.md` 和 `domain/terminal.md`
+- `L3`: optional 或 operational Specification files，通常不属于 minimum load set
 
-## Incremental Update Policy
+## Incremental Update Policy（增量更新策略）
 
-Default to incremental updates.
+默认使用 incremental updates。
 
-Update only changed entries when:
-- the current `index.md` exists
-- the entry format is valid
-- changed files can be identified with high confidence
+满足以下条件时，只更新已变更的 entries：
+- 当前 `index.md` 存在
+- entry format 有效
+- 能够高置信度识别 changed files
 
-Fallback to full rebuild only when:
-- `index.md` does not exist
-- the manifest schema changed
-- many Specification files were moved or renamed
-- the current index is clearly inconsistent with the filesystem
+仅在以下情况下 fallback 到 full rebuild：
+- `index.md` 不存在
+- manifest schema 已变更
+- 大量 Specification 文件被移动或重命名
+- 当前 index 与 filesystem 明显不一致
 
-When `index.md` is missing:
-- create it from [references/index-template.md](references/index-template.md)
-- replace placeholder entries with manifests derived from the real Specification files that already exist
+当 `index.md` 缺失时：
+- 基于 [references/index-template.md](references/index-template.md) 创建它
+- 用已经真实存在的 Specification 文件推导出的 manifests 替换 placeholder entries
 
-## Indexable File Guidance
+## Indexable File Guidance（可索引文件指南）
 
-Apply these defaults when deriving manifests:
+推导 manifests 时应用以下默认值：
 
 - `constitution/constitution.md`
   - `always_load: true`
@@ -126,41 +126,41 @@ Apply these defaults when deriving manifests:
 - `architecture/architecture.md`
   - `always_load: false`
   - `priority: "L1"`
-  - add triggers related to architecture, module split, layering, framework, cross-module changes
+  - 添加与 architecture、module split、layering、framework、cross-module changes 相关的 triggers
 
 - `architecture/DDD.md`
   - `always_load: false`
   - `priority: "L1"`
-  - add triggers related to aggregate, entity, value object, repository, domain service, bounded context, DDD
+  - 添加与 aggregate、entity、value object、repository、domain service、bounded context、DDD 相关的 triggers
 
 - `tool/tool.md`
   - `always_load: false`
   - `priority: "L1"`
-  - add triggers related to utility reuse, helper selection, validator, mapper, tracing, ID generation, common tooling
+  - 添加与 utility reuse、helper selection、validator、mapper、tracing、ID generation、common tooling 相关的 triggers
 
 - `domain/*.md`
   - `always_load: false`
   - `priority: "L2"`
-  - domains should reflect the concrete bounded context or business domain
+  - domains 应反映具体的 bounded context 或 business domain
 
-- operational files such as `TODO.md`
+- `TODO.md` 等 operational files
   - `always_load: false`
   - `priority: "L3"`
-  - keep triggers sparse unless the user explicitly wants these files to participate in retrieval
+  - 除非用户明确希望这些文件参与 retrieval，否则保持 triggers 稀疏
 
-## Writing Rules
+## Writing Rules（写入规则）
 
-- Keep `index.md` human-readable even though entries are JSON.
-- Prefer one JSON block per Specification file rather than one giant JSON blob.
-- Keep manifest entries concise and routing-friendly.
-- Preserve existing valid entries that are unrelated to the current change.
-- Do not invent domains or triggers without evidence.
-- If evidence is weak, keep `domains` or `triggers` small instead of speculative.
+- 即使 entries 是 JSON，也要保持 `index.md` human-readable。
+- 优先为每个 Specification 文件使用一个 JSON block，而不是一个巨大的 JSON blob。
+- 保持 manifest entries 简洁且 routing-friendly。
+- 保留与当前变更无关的现有有效 entries。
+- 不要在没有 evidence 的情况下编造 domains 或 triggers。
+- 如果 evidence 较弱，宁可让 `domains` 或 `triggers` 保持较小，也不要进行推测。
 
-## Completion
+## Completion（完成条件）
 
-Finish only after:
-- `./specification/index.md` exists
-- all affected Specification files are reflected in the index
-- deleted files are removed from the index
-- unchanged entries remain intact whenever incremental update was possible
+只有在满足以下条件后才结束：
+- `./specification/index.md` 存在
+- 所有受影响的 Specification 文件都已反映在 index 中
+- 已删除文件已从 index 中移除
+- 只要 incremental update 可行，未变更 entries 就保持 intact
